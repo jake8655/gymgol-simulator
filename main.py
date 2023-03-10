@@ -9,6 +9,72 @@ BACKGROUND_COLOR = 200, 100, 100
 BUTTONS_PLACE = 150
 
 TEACHERS = ["kisova", "hladka", "horvath", "laurinska", "palenikova", "zilka"]
+QUESTIONS = {
+    "kisova": [
+        {"question": "Kolik je 2+2?", "answers": ["2", "3", "4"], "correct": 2},
+        {"question": "Kolik je 2+3?", "answers": ["2", "3", "5"], "correct": 2},
+        {"question": "Kolik je 2+4?", "answers": ["6", "3", "8"], "correct": 1},
+        {"question": "Kolik je 2+5?", "answers": ["2", "7", "4"], "correct": 2},
+        {"question": "Kolik je 2+6?", "answers": ["2", "3", "8"], "correct": 2},
+        {"question": "Kolik je 2+7?", "answers": ["9", "0", "4"], "correct": 0},
+    ],
+    "hladka": [
+        {"question": "Kolik je 2+2?", "answers": ["2", "3", "4"], "correct": 2},
+        {"question": "Kolik je 2+3?", "answers": ["2", "3", "5"], "correct": 2},
+        {"question": "Kolik je 2+4?", "answers": ["6", "3", "8"], "correct": 1},
+        {"question": "Kolik je 2+5?", "answers": ["2", "7", "4"], "correct": 2},
+        {"question": "Kolik je 2+6?", "answers": ["2", "3", "8"], "correct": 2},
+        {"question": "Kolik je 2+7?", "answers": ["2", "0", "4"], "correct": 0},
+    ],
+    "horvath": [
+        {"question": "Kolik je 2+2?", "answers": ["2", "3", "4"], "correct": 2},
+        {"question": "Kolik je 2+3?", "answers": ["2", "3", "5"], "correct": 2},
+        {"question": "Kolik je 2+4?", "answers": ["6", "3", "8"], "correct": 1},
+        {"question": "Kolik je 2+5?", "answers": ["2", "7", "4"], "correct": 2},
+        {"question": "Kolik je 2+6?", "answers": ["2", "3", "8"], "correct": 2},
+        {"question": "Kolik je 2+7?", "answers": ["2", "0", "4"], "correct": 0},
+    ],
+    "laurinska": [
+        {"question": "Kolik je 2+2?", "answers": ["2", "3", "4"], "correct": 2},
+        {"question": "Kolik je 2+3?", "answers": ["2", "3", "5"], "correct": 2},
+        {"question": "Kolik je 2+4?", "answers": ["6", "3", "8"], "correct": 1},
+        {"question": "Kolik je 2+5?", "answers": ["2", "7", "4"], "correct": 2},
+        {"question": "Kolik je 2+6?", "answers": ["2", "3", "8"], "correct": 2},
+        {"question": "Kolik je 2+7?", "answers": ["2", "0", "4"], "correct": 0},
+    ],
+    "palenikova": [
+        {"question": "Kolik je 2+2?", "answers": ["2", "3", "4"], "correct": 2},
+        {"question": "Kolik je 2+3?", "answers": ["2", "3", "5"], "correct": 2},
+        {"question": "Kolik je 2+4?", "answers": ["6", "3", "8"], "correct": 1},
+        {"question": "Kolik je 2+5?", "answers": ["2", "7", "4"], "correct": 2},
+        {"question": "Kolik je 2+6?", "answers": ["2", "3", "8"], "correct": 2},
+        {"question": "Kolik je 2+7?", "answers": ["2", "0", "4"], "correct": 0},
+    ],
+    "zilka": [
+        {"question": "Kolik je 2+2?", "answers": ["2", "3", "4"], "correct": 2},
+        {"question": "Kolik je 2+3?", "answers": ["2", "3", "5"], "correct": 2},
+        {"question": "Kolik je 2+4?", "answers": ["6", "3", "8"], "correct": 1},
+        {"question": "Kolik je 2+5?", "answers": ["2", "7", "4"], "correct": 2},
+        {"question": "Kolik je 2+6?", "answers": ["2", "3", "8"], "correct": 2},
+        {"question": "Kolik je 2+7?", "answers": ["2", "0", "4"], "correct": 0},
+    ],
+}
+
+
+class Button(Sprite):
+    def __init__(self, image_file: str, position: tuple[int, int], question: dict):
+        Sprite.__init__(self)
+        self.image = pygame.image.load(image_file)
+        self.rect = self.image.get_rect(x=position[0], y=position[1])
+        self.question = question
+
+    def draw(self, screen: Surface):
+        screen.blit(self.image, self.rect)
+
+    def check_click(self) -> bool:
+        mouse_pos = pygame.mouse.get_pos()
+        # Also check for click (key event)
+        return self.rect.collidepoint(mouse_pos)
 
 
 class MovingGameObject(Sprite):
@@ -64,15 +130,21 @@ class Teacher(MovingGameObject):
         super().__init__(image_file, (randint(0, WIDTH - temp_sprite.width), randint(0, 20)), [0, 2])
         del temp_sprite
         self.dead = False
+        self.name = image_file.split("/")[-1].split(".")[0]
 
     def die(self):
         self.dead = True
         self.kill()
 
+    def ask(self):
+        pass
+
     def update(self, player_rect: Rect):
         super().update()
         collision = self.rect.colliderect(player_rect)
-        if collision or self.rect.top >= HEIGHT:
+        if collision:
+            self.ask()
+        if self.rect.top >= HEIGHT:
             self.die()
 
 
