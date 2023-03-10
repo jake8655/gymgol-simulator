@@ -62,7 +62,6 @@ class Teacher(MovingGameObject):
     def __init__(self, image_file: str):
         temp_sprite = pygame.image.load(image_file).get_rect()
         super().__init__(image_file, (randint(0, WIDTH - temp_sprite.width), randint(0, 20)), [0, 2])
-        self.image = pygame.transform.scale(self.image, (temp_sprite.width // 2, temp_sprite.height // 2))
         del temp_sprite
         self.dead = False
 
@@ -88,7 +87,7 @@ class Game:
         pygame.display.set_caption("Gymgol Simulator")
         pygame.display.set_icon(pygame.image.load("./assets/icon.png"))
 
-        self.sprites = [Player("./assets/sprites/student/student.gif"), Teacher("./assets/sprites/teachers/kisova.gif")]
+        self.sprites = [Player("./assets/sprites/student/student.png"), Teacher("./assets/sprites/teachers/kisova.png")]
 
         while True:
             time += 1
@@ -119,7 +118,7 @@ class Game:
             clock.tick(60)
 
             if time % (60 * multiplier) == 0:
-                self.sprites.append(Teacher(f"./assets/sprites/teachers/{TEACHERS[randint(0, len(TEACHERS) - 1)]}.gif"))
+                self.sprites.append(Teacher(f"./assets/sprites/teachers/{TEACHERS[randint(0, len(TEACHERS) - 1)]}.png"))
 
 
 game = Game()
