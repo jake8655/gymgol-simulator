@@ -64,6 +64,8 @@ class Game:
 
         clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode(size, 0, 32)
+        pygame.display.set_caption("Gymgol Simulator")
+        pygame.display.set_icon(pygame.image.load("./assets/icon.ico"))
 
         self.sprites = [Player("./assets/intro_ball.gif"), Teacher("./assets/intro_ball.gif")]
 
