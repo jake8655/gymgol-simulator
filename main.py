@@ -55,6 +55,7 @@ pause = False
 lost = False
 time = 0
 multiplier = 10
+timer = 0
 
 
 class LoseText(Sprite):
@@ -245,7 +246,7 @@ class Game:
     def __init__(self):
         pygame.init()
 
-        global time, multiplier
+        global time, multiplier, timer, lost, pause
         clock = pygame.time.Clock()
         big_font = pygame.font.SysFont("Arial", 20)
         small_font = pygame.font.SysFont("Arial", 15)
@@ -260,6 +261,11 @@ class Game:
         while True:
             if not pause and not lost:
                 time += 1
+            if pause:
+                timer += 1
+            if timer == 60 * 5:
+                timer = 0
+                lost = True
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
