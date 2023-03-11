@@ -52,6 +52,42 @@ QUESTIONS = {
 }
 
 pause = False
+lost = False
+time = 0
+multiplier = 10
+
+
+class LoseText(Sprite):
+    def __init__(self, small_font: Font, sprites):
+        Sprite.__init__(self)
+        font = pygame.font.SysFont("Arial", 50)
+        self.text = font.render("Dostal si 5 D:", True, (50, 0, 100))
+        self.rect = self.text.get_rect()
+        self.rect.center = (WIDTH // 2, HEIGHT // 2)
+        self.retry_text = small_font.render("Skúsiť znovu", True, (50, 0, 100))
+        self.retry_box = Rect(
+            WIDTH // 2 - self.retry_text.get_width() // 2,
+            HEIGHT // 2 + 50,
+            self.retry_text.get_width() + 20,
+            self.retry_text.get_height() + 20,
+        )
+        self.sprites = sprites
+
+    def draw(self, screen: Surface):
+        screen.blit(self.text, self.rect)
+        pygame.draw.rect(screen, (100, 200, 100), self.retry_box, 0, 10)
+        screen.blit(self.retry_text, (self.retry_box.x + 10, self.retry_box.y + 10))
+
+    def on_click(self):
+        if not self.retry_box.collidepoint(pygame.mouse.get_pos()):
+            return
+        for sprite in self.sprites:
+            if type(sprite) != LoseText:
+                self.sprites.remove(sprite)
+        self.sprites.append(Player("./assets/sprites/student/student.png"))
+        global lost, pause, time, multiplier
+        lost, pause, time, multiplier = False, False, 1, 10
+        self.sprites.remove(self)
 
 
 class Button(Sprite):
@@ -73,7 +109,6 @@ class Button(Sprite):
         self.sprites = sprites
 
     def die(self):
-        print(f"Killing {self.debug}")
         self.kill()
         self.sprites.remove(self)
 
@@ -82,6 +117,8 @@ class Button(Sprite):
         screen.blit(self.text, (self.rect.x + 10, self.rect.y + 10))
 
     def on_click(self):
+        if not self.rect.collidepoint(pygame.mouse.get_pos()):
+            return
         if self.correct:
             self.teacher.die()
             # Remove unused elements
@@ -99,7 +136,8 @@ class Button(Sprite):
             global pause
             pause = False
         else:
-            print("Wrong answer!")
+            global lost
+            lost = True
 
 
 class MovingGameObject(Sprite):
@@ -207,8 +245,7 @@ class Game:
     def __init__(self):
         pygame.init()
 
-        time = 0
-        multiplier = 10
+        global time, multiplier
         clock = pygame.time.Clock()
         big_font = pygame.font.SysFont("Arial", 20)
         small_font = pygame.font.SysFont("Arial", 15)
@@ -216,12 +253,13 @@ class Game:
         pygame.display.set_caption("Gymgol Simulator")
         pygame.display.set_icon(pygame.image.load("./assets/icon.png"))
 
-        sprites: list[Union[Player, Teacher, Button]] = [
+        sprites: list[Union[Player, Teacher, Button, LoseText]] = [
             Player("./assets/sprites/student/student.png"),
         ]
 
         while True:
-            time += 1
+            if not pause and not lost:
+                time += 1
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
@@ -233,7 +271,7 @@ class Game:
                             sprite.on_key_down(event.key)
                 elif event.type == pygame.MOUSEBUTTONUP:
                     for sprite in sprites:
-                        if type(sprite) == Button and sprite.rect.collidepoint(event.pos):
+                        if type(sprite) == Button or type(sprite) == LoseText:
                             sprite.on_click()
 
             screen.fill(BACKGROUND_COLOR)
@@ -254,7 +292,7 @@ class Game:
 
             if time == 1:
                 sprites.append(Teacher("./assets/sprites/teachers/kisova.png", sprites, big_font, small_font))
-            if time % (60 * multiplier) == 0 and not pause:
+            if time % (60 * multiplier) == 0:
                 sprites.append(
                     Teacher(
                         f"./assets/sprites/teachers/{TEACHERS[randint(0, len(TEACHERS) - 1)]}.png",
@@ -263,6 +301,10 @@ class Game:
                         small_font,
                     )
                 )
+
+            if lost:
+                sprites = []
+                sprites.append(LoseText(big_font, sprites))
 
 
 game = Game()
