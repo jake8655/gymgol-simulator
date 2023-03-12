@@ -1,0 +1,14 @@
+MUST:
+- Write normal questions (At least 3 per teacher)
+- Add my photo as the face of the student
+- Change text and button colors
+
+COULD:
+- Change background
+- Show timer in the top right corner
+- Show when the question is answered correctly (in the top right corner?)
+- Add some sort of tutorial or just some explaining text
+- Add sound effects and or music
+
+DONE:
+- Add timer to answering questions
